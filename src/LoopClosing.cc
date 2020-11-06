@@ -160,54 +160,54 @@ void LoopClosing::Run()
 
                 if(mbLoopDetected)
                 {
-                    vdPR_CurrentTime.push_back(mpCurrentKF->mTimeStamp);
-                    vdPR_MatchedTime.push_back(mpLoopMatchedKF->mTimeStamp);
-                    vnPR_TypeRecogn.push_back(0);
+                    // vdPR_CurrentTime.push_back(mpCurrentKF->mTimeStamp);
+                    // vdPR_MatchedTime.push_back(mpLoopMatchedKF->mTimeStamp);
+                    // vnPR_TypeRecogn.push_back(0);
 
 
-                    Verbose::PrintMess("*Loop detected", Verbose::VERBOSITY_QUIET);
+                    // Verbose::PrintMess("*Loop detected", Verbose::VERBOSITY_QUIET);
 
-                    mg2oLoopScw = mg2oLoopSlw; //*mvg2oSim3LoopTcw[nCurrentIndex];
-                    if(mpCurrentKF->GetMap()->IsInertial())
-                    {
-                        cv::Mat Twc = mpCurrentKF->GetPoseInverse();
-                        g2o::Sim3 g2oTwc(Converter::toMatrix3d(Twc.rowRange(0, 3).colRange(0, 3)),Converter::toVector3d(Twc.rowRange(0, 3).col(3)),1.0);
-                        g2o::Sim3 g2oSww_new = g2oTwc*mg2oLoopScw;
+                    // mg2oLoopScw = mg2oLoopSlw; //*mvg2oSim3LoopTcw[nCurrentIndex];
+                    // if(mpCurrentKF->GetMap()->IsInertial())
+                    // {
+                    //     cv::Mat Twc = mpCurrentKF->GetPoseInverse();
+                    //     g2o::Sim3 g2oTwc(Converter::toMatrix3d(Twc.rowRange(0, 3).colRange(0, 3)),Converter::toVector3d(Twc.rowRange(0, 3).col(3)),1.0);
+                    //     g2o::Sim3 g2oSww_new = g2oTwc*mg2oLoopScw;
 
-                        Eigen::Vector3d phi = LogSO3(g2oSww_new.rotation().toRotationMatrix());
-                        //cout << "tw2w1: " << g2oSww_new.translation() << endl;
-                        //cout << "Rw2w1: " << g2oSww_new.rotation().toRotationMatrix() << endl;
-                        //cout << "Angle Rw2w1: " << 180*phi/3.14 << endl;
-                        //cout << "scale w2w1: " << g2oSww_new.scale() << endl;
+                    //     Eigen::Vector3d phi = LogSO3(g2oSww_new.rotation().toRotationMatrix());
+                    //     //cout << "tw2w1: " << g2oSww_new.translation() << endl;
+                    //     //cout << "Rw2w1: " << g2oSww_new.rotation().toRotationMatrix() << endl;
+                    //     //cout << "Angle Rw2w1: " << 180*phi/3.14 << endl;
+                    //     //cout << "scale w2w1: " << g2oSww_new.scale() << endl;
 
-                        if (fabs(phi(0))<0.008f && fabs(phi(1))<0.008f && fabs(phi(2))<0.349f)
-                        {
-                            if(mpCurrentKF->GetMap()->IsInertial())
-                            {
-                                // If inertial, force only yaw
-                                if ((mpTracker->mSensor==System::IMU_MONOCULAR ||mpTracker->mSensor==System::IMU_STEREO) &&
-                                        mpCurrentKF->GetMap()->GetIniertialBA2()) // TODO, maybe with GetIniertialBA1
-                                {
-                                    phi(0)=0;
-                                    phi(1)=0;
-                                    g2oSww_new = g2o::Sim3(ExpSO3(phi),g2oSww_new.translation(),1.0);
-                                    mg2oLoopScw = g2oTwc.inverse()*g2oSww_new;
-                                }
-                            }
+                    //     if (fabs(phi(0))<0.008f && fabs(phi(1))<0.008f && fabs(phi(2))<0.349f)
+                    //     {
+                    //         if(mpCurrentKF->GetMap()->IsInertial())
+                    //         {
+                    //             // If inertial, force only yaw
+                    //             if ((mpTracker->mSensor==System::IMU_MONOCULAR ||mpTracker->mSensor==System::IMU_STEREO) &&
+                    //                     mpCurrentKF->GetMap()->GetIniertialBA2()) // TODO, maybe with GetIniertialBA1
+                    //             {
+                    //                 phi(0)=0;
+                    //                 phi(1)=0;
+                    //                 g2oSww_new = g2o::Sim3(ExpSO3(phi),g2oSww_new.translation(),1.0);
+                    //                 mg2oLoopScw = g2oTwc.inverse()*g2oSww_new;
+                    //             }
+                    //         }
 
-                            mvpLoopMapPoints = mvpLoopMPs;//*mvvpLoopMapPoints[nCurrentIndex];
-                            CorrectLoop();
-                        }
-                        else
-                        {
-                            cout << "BAD LOOP!!!" << endl;
-                        }
-                    }
-                    else
-                    {
-                        mvpLoopMapPoints = mvpLoopMPs;
-                        CorrectLoop();
-                    }
+                    //         mvpLoopMapPoints = mvpLoopMPs;//*mvvpLoopMapPoints[nCurrentIndex];
+                    //         CorrectLoop();
+                    //     }
+                    //     else
+                    //     {
+                    //         cout << "BAD LOOP!!!" << endl;
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     mvpLoopMapPoints = mvpLoopMPs;
+                    //     CorrectLoop();
+                    // }
 
                     // Reset all variables
                     mpLoopLastCurrentKF->SetErase();

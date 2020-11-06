@@ -27,6 +27,8 @@ namespace ORB_SLAM3
 
 long unsigned int KeyFrame::nNextId=0;
 
+//pcl::visualization::CloudViewer KeyFrame::viewer ("viewer");
+
 KeyFrame::KeyFrame():
         mnFrameId(0),  mTimeStamp(0), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
         mfGridElementWidthInv(0), mfGridElementHeightInv(0),
@@ -62,7 +64,7 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     mbToBeErased(false), mbBad(false), mHalfBaseline(F.mb/2), mpMap(pMap), mbCurrentPlaceRecognition(false), mNameFile(F.mNameFile), mbHasHessian(false), mnMergeCorrectedForKF(0),
     mpCamera(F.mpCamera), mpCamera2(F.mpCamera2),
     mvLeftToRightMatch(F.mvLeftToRightMatch),mvRightToLeftMatch(F.mvRightToLeftMatch),mTlr(F.mTlr.clone()),
-    mvKeysRight(F.mvKeysRight), NLeft(F.Nleft), NRight(F.Nright), mTrl(F.mTrl), mnNumberOfOpt(0)
+    mvKeysRight(F.mvKeysRight), NLeft(F.Nleft), NRight(F.Nright), mTrl(F.mTrl), mnNumberOfOpt(0), mpPointClouds(new PointCloud())
 {
 
     imgLeft = F.imgLeft.clone();
@@ -84,8 +86,6 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
         }
     }
 
-
-
     if(F.mVw.empty())
         Vw = cv::Mat::zeros(3,1,CV_32F);
     else
@@ -95,6 +95,25 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     SetPose(F.mTcw);
 
     mnOriginMapId = pMap->GetId();
+
+    for ( int m=0; m<F.mImDepth.rows; m+=3 )
+    {
+        for ( int n=0; n<F.mImDepth.cols; n+=3 )
+        {
+            float d = F.mImDepth.ptr<float>(m)[n];
+            if(d < 0.2 || d > 8)
+                continue;
+            PointT p;
+            p.x = (n - cx) * d * invfx;
+            p.y = (m - cy) * d * invfy;
+            p.z = d;
+            p.b = F.mImRGB.ptr<uchar>(m)[n*3];
+            p.g = F.mImRGB.ptr<uchar>(m)[n*3+1];
+            p.r = F.mImRGB.ptr<uchar>(m)[n*3+2];
+            mpPointClouds->points.push_back(p);
+        }
+    }
+//    viewer.showCloud( mpPointClouds );
 }
 
 void KeyFrame::ComputeBoW()

@@ -23,9 +23,14 @@
 #include"Atlas.h"
 #include"MapPoint.h"
 #include"KeyFrame.h"
+#include "Converter.h"
 #include<pangolin/pangolin.h>
 
 #include<mutex>
+#include <pcl/common/transforms.h>
+#include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 namespace ORB_SLAM3
 {
@@ -33,11 +38,14 @@ namespace ORB_SLAM3
 class MapDrawer
 {
 public:
+    typedef pcl::PointXYZRGB PointT;
+    typedef pcl::PointCloud <PointT> PointCloud;
     MapDrawer(Atlas* pAtlas, const string &strSettingPath);
 
     Atlas* mpAtlas;
 
     void DrawMapPoints();
+    void DrawMapDensePoints();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const bool bDrawInertialGraph);
     void DrawCurrentCamera(pangolin::OpenGlMatrix &Twc);
     void SetCurrentCameraPose(const cv::Mat &Tcw);

@@ -438,27 +438,28 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 {
     mImGray = imRGB;
     cv::Mat imDepth = imD;
+    mImRGB = imRGB;
 
-    if(mImGray.channels()==3)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
-    }
-    else if(mImGray.channels()==4)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
-    }
+     if(mImGray.channels()==3)
+     {
+         if(mbRGB)
+             cvtColor(mImGray,mImGray,CV_RGB2GRAY);
+         else
+             cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+     }
+     else if(mImGray.channels()==4)
+     {
+         if(mbRGB)
+             cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
+         else
+             cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+     }
 
     if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
         imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
-    mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera);
+    mCurrentFrame = Frame(mImRGB, mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera);
 
     mCurrentFrame.mNameFile = filename;
     mCurrentFrame.mnDataset = mnNumDataset;

@@ -26,7 +26,6 @@
 namespace ORB_SLAM3
 {
 
-
 MapDrawer::MapDrawer(Atlas* pAtlas, const string &strSettingPath):mpAtlas(pAtlas)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
@@ -75,7 +74,37 @@ void MapDrawer::DrawMapPoints()
         glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
 
     }
+    glEnd();
+}
 
+void MapDrawer::DrawMapDensePoints()
+{
+    const vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
+    PointCloud::Ptr allCloudPoints(new PointCloud);
+    for(size_t i=0; i<vpKFs.size(); i++)
+    {
+        KeyFrame* pKF = vpKFs[i];
+        Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(pKF->GetPose());
+
+        PointCloud::Ptr cloud(new PointCloud);
+        pcl::transformPointCloud(*pKF->mpPointClouds, *cloud, T.inverse().matrix());
+
+        *allCloudPoints += *cloud;
+    }
+    pcl::VoxelGrid<PointT>  voxel;
+//    voxel.setLeafSize( 0.03, 0.03, 0.03);
+//    PointCloud::Ptr results(new PointCloud());
+//    voxel.setInputCloud(allCloudPoints);
+//    voxel.filter(*results);
+    glPointSize(mPointSize);
+    glBegin(GL_POINTS);
+    for(auto p : allCloudPoints->points){
+        float r = p.r;
+        float g = p.g;
+        float b = p.b;
+        glColor3f(r/255, g/255, b/255);
+        glVertex3f(p.x, p.y, p.z);
+    }
     glEnd();
 }
 

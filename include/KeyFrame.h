@@ -37,7 +37,9 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 
-
+#include <pcl/common/transforms.h>
+#include <pcl/point_types.h>
+#include <pcl/visualization/cloud_viewer.h>
 namespace ORB_SLAM3
 {
 
@@ -279,6 +281,8 @@ class KeyFrame
     }
 
 public:
+    typedef pcl::PointXYZRGB PointT;
+    typedef pcl::PointCloud <PointT> PointCloud;
     KeyFrame();
     KeyFrame(Frame &F, Map* pMap, KeyFrameDatabase* pKFDB);
 
@@ -386,6 +390,9 @@ public:
 
     bool bImu;
 
+//    cv::Mat mImRGB, mImDepth;
+    PointCloud::Ptr mpPointClouds;
+//    static pcl::visualization::CloudViewer viewer;
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
 
